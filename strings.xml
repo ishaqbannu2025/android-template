@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">android-template</string>
+    <string name="app_name">webviewapp</string> <!-- Change this to your app's name -->
 </resources>
