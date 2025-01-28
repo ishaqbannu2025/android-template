@@ -1,0 +1,38 @@
+workflows:
+  flutter-app-build:
+    name: Flutter App Build
+    max_build_duration: 120
+    instance_type: mac_mini_m1
+    environment:
+      flutter: stable
+      groups:
+        - signing_credentials
+    scripts:
+      - name: Install dependencies
+        script: |
+          flutter packages get
+
+      - name: Build APK
+        script: |
+          flutter build apk --release
+
+      - name: Build AAB
+        script: |
+          flutter build appbundle --release
+
+      - name: Upload Build Artifacts
+        script: |
+          mkdir -p build_outputs
+          mv build/app/outputs/flutter-apk/app-release.apk build_outputs/
+          mv build/app/outputs/bundle/release/app-release.aab build_outputs/
+    artifacts:
+      - build_outputs/**/*
+    publishing:
+      scripts:
+        - name: Upload APK/AAB to Back4App
+          script: |
+            curl -X POST "https://parseapi.back4app.com/functions/storeBuild" \
+              -H "X-Parse-Application-Id: $Dms1OiuzB1hkv1OfhGofXNRnq5zEel2LgHCisjHY" \
+              -H "X-Parse-REST-API-Key: $QptYLpqJwGj6OjWCqml6dv4WdkMVPBfSSuL1qES1" \
+              -H "Content-Type: application/json" \
+              -d "{\"buildType\":\"${CM_BUILD_TYPE}\", \"downloadUrl\":\"https://your-codemagic-storage.com/${CM_BUILD_ID}\"}"
